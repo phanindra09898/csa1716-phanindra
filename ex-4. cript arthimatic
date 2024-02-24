@@ -1,32 +1,45 @@
-def isCryptSolution(crypt, solution):
-        newsol = list(zip(*reversed(solution)))
-        newstring1 = ''
-        total = 0
-        for word in range(len(crypt)-1):
-            subtotal, sol_total = 0, 0
-            newstring = ''
-            for char in crypt[word]:
-                idx = newsol[0].index(char)
-                newstring = newstring + newsol[1][idx]
-                subtotal = int(newstring)
-            total = total + subtotal
-        for char1 in crypt[-1]:
-            nidx = newsol[0].index(char1)
-            newstring1 = newstring1 + newsol[1][nidx]
-            sol_total = int(newstring1)
-        if total == sol_total and newstring[0] != '0':
-            return print('True')
-        elif total == 0 and newstring[0] == '0' and len(newstring) == 1:
-            return print('True')
-        else:
-            return print('False')
-crypt = ["SEND", "MORE", "MONEY"]
-solution = [['O', '0'],
-            ['M', '1'],
-            ['Y', '2'],
-            ['E', '5'],
-            ['N', '6'],
-            ['D', '7'],
-            ['R', '8'],
-            ['S', '9']]
-isCryptSolution(crypt, solution)
+from itertools import permutations
+
+def solve_cryptarithmetic(puzzle):
+    # Extract unique characters from the puzzle
+    chars = set()
+    for word in puzzle:
+        for char in word:
+            chars.add(char)
+    
+    # Solve the puzzle by trying all possible combinations of values for characters
+    for values in generate_possible_values(chars):
+        if is_solution(puzzle, values):
+            return values
+    
+    # If no solution found
+    return None
+
+
+def generate_possible_values(chars):
+    # Generate all possible combinations of values for characters
+    num_values = len(chars)
+    for values in permutations(range(10), num_values):
+        yield dict(zip(chars, values))
+
+
+def is_solution(puzzle, values):
+    # Evaluate the puzzle with the given values
+    num_puzzle = []
+    for word in puzzle:
+        num_word = ''.join(str(values[char]) for char in word)
+        num_puzzle.append(int(num_word))
+    
+    # Check if the puzzle is solved
+    return sum(num_puzzle[:-1]) == num_puzzle[-1]
+
+
+# Example usage:
+puzzle = ["SEND", "MORE", "MONEY"]
+solution = solve_cryptarithmetic(puzzle)
+
+if solution:
+    print("Solution found:")
+    print(solution)
+else:
+    print("No solution found.")
